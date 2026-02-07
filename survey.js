@@ -287,17 +287,18 @@
         const q = questions[state.step];
 
         // Notify multi-select answers on advance
-        if (q.type === 'multi' && Array.isArray(state.answers[q.id])) {
+        if (q.type === 'multi') {
+            const arr = Array.isArray(state.answers[q.id]) ? state.answers[q.id] : [];
             const opts = q.optionsBySegment
                 ? (q.optionsBySegment[state.segment] || q.optionsBySegment.couple)
                 : q.options;
-            const labels = state.answers[q.id].map(v => {
+            const labels = arr.map(v => {
                 const o = opts.find(x => x.value === v);
                 return o ? o.text : v;
             });
             const otherText = state.answers[q.id + '_other'];
             if (otherText) labels.push('✏️ ' + otherText);
-            notifyAnswer(q.id, q.title, labels);
+            if (labels.length > 0) notifyAnswer(q.id, q.title, labels);
         }
 
         // Check disqualification
