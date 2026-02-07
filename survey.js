@@ -254,6 +254,7 @@
         document.body.style.overflow = 'hidden';
         if (!surveyStartNotified && state.step === 0) {
             notifySurveyStart();
+            reachGoal('survey_start');
             surveyStartNotified = true;
         }
         render();
@@ -539,7 +540,8 @@
                 <h2>Спасибо за интерес!</h2>
                 <p>Мы пока фокусируемся на Мурино и ближайших районах. Но следи за нами — возможно, скоро расширимся!</p>
                 <div class="survey-result-links">
-                    <a href="https://t.me/murchill" target="_blank" class="survey-result-link primary">Подписаться на Telegram-канал 💬</a>
+                    <a href="https://t.me/murchill" target="_blank" class="survey-result-link primary">Telegram-канал 💬</a>
+                    <a href="https://vk.com/murchill_catcafe" target="_blank" class="survey-result-link secondary">Группа VK 💙</a>
                 </div>
             </div>`;
     }
@@ -552,7 +554,8 @@
                 <h2>Спасибо за честность!</h2>
                 <p>Мы ценим ваше мнение. Если передумаете — мы будем рады вас видеть!</p>
                 <div class="survey-result-links">
-                    <a href="https://t.me/murchill" target="_blank" class="survey-result-link secondary">Подписаться на Telegram-канал 💬</a>
+                    <a href="https://t.me/murchill" target="_blank" class="survey-result-link secondary">Telegram-канал 💬</a>
+                    <a href="https://vk.com/murchill_catcafe" target="_blank" class="survey-result-link secondary">Группа VK 💙</a>
                 </div>
             </div>`;
     }
@@ -563,6 +566,10 @@
             && state.answers.timing === 'first_week'
             && withContact && state.telegramHandle;
 
+
+        reachGoal('survey_complete');
+        if (withContact && state.telegramHandle) reachGoal('lead_contact');
+        if (isHotLead) reachGoal('hot_lead');
 
         // Telegram notification
         notifyComplete({
@@ -599,7 +606,8 @@
 
         html += `
             <div class="survey-result-links">
-                <a href="https://t.me/murchill" target="_blank" class="survey-result-link primary">Подписаться на Telegram-канал 💬</a>
+                <a href="https://t.me/murchill" target="_blank" class="survey-result-link primary">Telegram-канал 💬</a>
+                <a href="https://vk.com/murchill_catcafe" target="_blank" class="survey-result-link secondary">Группа VK 💙</a>
             </div>
             <div class="share-buttons">
                 <button class="share-btn tg" onclick="shareTelegram()">Telegram</button>
@@ -622,6 +630,14 @@
         window.open(`https://vk.com/share.php?url=${url}`, '_blank');
     };
 
+
+    // ---- YANDEX METRIKA GOALS ----
+    function reachGoal(name) {
+        if (typeof ym === 'function') {
+            // TODO: заменить 00000000 на реальный номер счётчика
+            ym(106703806, 'reachGoal', name);
+        }
+    }
 
     // ---- TELEGRAM NOTIFICATIONS ----
     function sendToTelegram(text) {
