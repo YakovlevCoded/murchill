@@ -6,13 +6,9 @@
 (function () {
     'use strict';
 
-    // ---- CONFIG (from config.js) ----
-    const cfg = window.MURCHILL_CONFIG || {};
-    const AIRTABLE_TOKEN = cfg.AIRTABLE_TOKEN || '';
-    const AIRTABLE_BASE = cfg.AIRTABLE_BASE || '';
-    const AIRTABLE_TABLE = cfg.AIRTABLE_TABLE || '';
-    const TG_BOT_TOKEN = cfg.TG_BOT_TOKEN || '';
-    const TG_CHAT_ID = cfg.TG_CHAT_ID || '';
+    // ---- TELEGRAM CONFIG ----
+    const TG_BOT_TOKEN = '8085859253:AAGi59iLgCwAf1IMwqwkqev1iSeM5bFMdME';
+    const TG_CHAT_ID = '-5130843471';
 
     // ---- STATE ----
     const STORAGE_KEY = 'murkoteka_survey';
@@ -567,14 +563,6 @@
             && state.answers.timing === 'first_week'
             && withContact && state.telegramHandle;
 
-        // Send to Airtable
-        sendToAirtable({
-            visitorId: visitorId,
-            segment: state.segment,
-            answers: state.answers,
-            telegramHandle: state.telegramHandle,
-            isHotLead: isHotLead
-        });
 
         // Telegram notification
         notifyComplete({
@@ -634,39 +622,6 @@
         window.open(`https://vk.com/share.php?url=${url}`, '_blank');
     };
 
-    // ---- AIRTABLE ----
-    function sendToAirtable(data) {
-        if (!AIRTABLE_TOKEN) return;
-        const answers = data.answers || {};
-        const fields = {
-            'Дата': new Date().toISOString(),
-            'Visitor ID': data.visitorId || '',
-            'Сегмент': data.segment || '',
-            'Локация': answers.location || '',
-            'Кто': answers.who || '',
-            'Некуда пойти': answers.boredom || '',
-            'Интерес': answers.interest || '',
-            'Формат': Array.isArray(answers.format) ? answers.format.join(', ') : (answers.format || ''),
-            'Формат оплаты': answers.payment_format || '',
-            'Цена': answers.price || '',
-            'Частота': answers.frequency || '',
-            'Барьеры': Array.isArray(answers.blockers) ? answers.blockers.join(', ') : (answers.blockers || ''),
-            'Барьеры своё': answers.blockers_other || '',
-            'Каналы': Array.isArray(answers.channels) ? answers.channels.join(', ') : (answers.channels || ''),
-            'Каналы своё': answers.channels_other || '',
-            'Когда придёт': answers.timing || '',
-            'Telegram': data.telegramHandle || '',
-            'Горячий лид': data.isHotLead ? 'Да' : 'Нет'
-        };
-        fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${AIRTABLE_TABLE}`, {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + AIRTABLE_TOKEN,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ records: [{ fields }], typecast: true })
-        }).catch(() => {});
-    }
 
     // ---- TELEGRAM NOTIFICATIONS ----
     function sendToTelegram(text) {
